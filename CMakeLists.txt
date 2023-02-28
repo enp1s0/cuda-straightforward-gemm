@@ -64,6 +64,7 @@ if (${BUILD_TEST})
 		target_link_libraries(${test_out} PRIVATE
 			CUDA::cublas
 			CUDA::curand
+			cugemm
 			)
 	endforeach()
 endif()

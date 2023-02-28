@@ -7,10 +7,10 @@ __global__ void gemm_kernel(
 		const unsigned m,
 		const unsigned n,
 		const unsigned k,
-		const T* const alpha,
+		const T alpha,
 		const T* const A_ptr, const unsigned lda,
 		const T* const B_ptr, const unsigned ldb,
-		const T* const beta,
+		const T beta,
 		T* const C_ptr, const unsigned ldc
 		) {
 	const auto tid = threadIdx.x + blockDim.x * blockIdx.x;
@@ -28,10 +28,10 @@ __global__ void gemm_kernel(
 		sum += A_ptr[A_offset] * B_ptr[B_offset];
 	}
 
-	if (*beta == static_cast<T>(0)) {
-		C_ptr[mi + ni * ldc] = *alpha * sum;
+	if (beta == static_cast<T>(0)) {
+		C_ptr[mi + ni * ldc] = alpha * sum;
 	} else {
-		C_ptr[mi + ni * ldc] = *alpha * sum + *beta * C_ptr[mi + ni * ldc];
+		C_ptr[mi + ni * ldc] = alpha * sum + beta * C_ptr[mi + ni * ldc];
 	}
 }
 
@@ -58,10 +58,10 @@ cublasStatus_t mtk::cugemm::gemm(
 	gemm_kernel<<<grid_size, block_size, 0, cuda_stream>>>(
 			op_A, op_B,
 			m, n, k,
-			alpha,
+			*alpha,
 			A_ptr, lda,
 			B_ptr, ldb,
-			beta,
+			*beta,
 			C_ptr, ldc
 			);
 
