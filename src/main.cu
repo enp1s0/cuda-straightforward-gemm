@@ -23,7 +23,7 @@ __global__ void gemm_kernel(
 	T sum = 0;
 	for (unsigned ki = 0; ki < k; ki++) {
 		const std::size_t A_offset = (op_A == CUBLAS_OP_N ? (mi + ki * lda) : (ki + mi * lda));
-		const std::size_t B_offset = (op_B == CUBLAS_OP_N ? (ki + ni * ldb) : (ni + ni * ldb));
+		const std::size_t B_offset = (op_B == CUBLAS_OP_N ? (ki + ni * ldb) : (ni + ki * ldb));
 
 		sum += A_ptr[A_offset] * B_ptr[B_offset];
 	}
