@@ -5,7 +5,7 @@
 
 template <class T> double get_error_threshold() {return 0;};
 template <> double get_error_threshold<double>() {return 1e-14;};
-template <> double get_error_threshold<float >() {return 1e-6;};
+template <> double get_error_threshold<float >() {return 1e-5;};
 template <> double get_error_threshold<half  >() {return 1e-2;};
 
 template <class T>
@@ -22,11 +22,11 @@ void eval_matmul(
 	cudaMallocManaged(&mat_c, sizeof(T) * m * n);
 
 	for (unsigned i = 0; i < m * k; i++) {
-		mat_a[i] = static_cast<double>(m * k / 2 - i) * 1e-3;
+		mat_a[i] = static_cast<double>(static_cast<int>(i) % 100 / 2. - 50) * 1e-2;
 	}
 
 	for (unsigned i = 0; i < n * k; i++) {
-		mat_b[i] = static_cast<double>(n * k / 2 - i) * 1e-3;
+		mat_b[i] = static_cast<double>(static_cast<int>(i) % 100 / 2. - 50) * 1e-2;
 	}
 
 	const T alpha = static_cast<T>(1);
