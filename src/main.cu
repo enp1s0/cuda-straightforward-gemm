@@ -52,8 +52,10 @@ cublasStatus_t mtk::cugemm::gemm(
 	const auto block_size = 256lu;
 	const auto grid_size = (m * n + block_size - 1) / block_size;
 
-	cudaStream_t cuda_stream;
-	cublasGetStream(cublas_handle, &cuda_stream);
+	cudaStream_t cuda_stream = 0;
+	if (cublas_handle != nullptr) {
+		cublasGetStream(cublas_handle, &cuda_stream);
+	}
 
 	gemm_kernel<<<grid_size, block_size, 0, cuda_stream>>>(
 			op_A, op_B,
