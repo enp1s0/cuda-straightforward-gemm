@@ -21,11 +21,16 @@ __global__ void gemm_kernel(
 	const auto ni = tid / m;
 
 	T sum = 0;
-	for (unsigned ki = 0; ki < k; ki++) {
-		const std::size_t A_offset = (op_A == CUBLAS_OP_N ? (mi + ki * lda) : (ki + mi * lda));
-		const std::size_t B_offset = (op_B == CUBLAS_OP_N ? (ki + ni * ldb) : (ni + ki * ldb));
+	for (unsigned ki_global = 0; ki_global < k; ki_global += 8) {
 
-		sum += A_ptr[A_offset] * B_ptr[B_offset];
+		T local_sum = 0;
+		unsigned ki;
+		for (unsigned ki_local = 0; ki_local < 8 && (ki = ki_global + ki_local) < k; ki_local++) {
+			const std::size_t A_offset = (op_A == CUBLAS_OP_N ? (mi + ki * lda) : (ki + mi * lda));
+			const std::size_t B_offset = (op_B == CUBLAS_OP_N ? (ki + ni * ldb) : (ni + ki * ldb));
+			local_sum += A_ptr[A_offset] * B_ptr[B_offset];
+		}
+		sum += local_sum;
 	}
 
 	if (beta == static_cast<T>(0)) {
